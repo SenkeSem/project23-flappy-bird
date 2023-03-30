@@ -7,6 +7,13 @@ var fg = new Image();
 var pipeUp = new Image();
 var pipeBottom = new Image();
 
+//Звуковые файлы
+var fly = new Audio();
+var score_audio = new Audio();
+
+fly.src = "audio/fly.mp3";
+score_audio.src = "audio/score.mp3";
+
 bird.src = "img/bird.png";
 bg.src = "img/bg.png";
 fg.src = "img/fg.png";
@@ -20,7 +27,8 @@ var gap = 90;
 document.addEventListener("keydown", moveUp);
 
 function moveUp() {
-    yPos -= 20;
+    yPos -= 25;
+    fly.play();
 }
 
 // Создание блоков
@@ -32,11 +40,12 @@ pipe[0] = {
     y : 0
 }
 
+var score = 0;
 // Позиция птички
 
 var xPos = 10;
 var yPos = 150;
-var grav = 1;
+var grav = 1.5;
 
 function draw() {
     ctx.drawImage(bg, 0, 0);
@@ -53,12 +62,28 @@ function draw() {
                 y : Math.floor(Math.random() * pipeUp.height) - pipeUp.height
             });
         }
+
+        // Отслеживание столкновений
+
+        if (xPos + bird.width >= pipe[i].x && xPos <= pipe[i].x + pipeUp.width && (yPos <= pipe[i].y + pipeUp.height || yPos + bird.height >= pipe[i].y + pipeUp.height + gap) || yPos + bird.height >= cvs.height - fg.height) {
+            location.reload(); // перезагрузка страницы
+        }
+
+        if(pipe[i].x == 5) {
+            score++;
+            score_audio.play();
+        }
     }
 
     ctx.drawImage(fg, 0, cvs.height - fg.height);
     ctx.drawImage(bird, xPos, yPos);
 
     yPos += grav;
+
+    ctx.fillStyle = "#000";
+    ctx.font = "24px Verdana";
+    ctx.fillText("Счёт: " + score, 10, cvs.height - 20);
+
     requestAnimationFrame(draw);
 }
 
